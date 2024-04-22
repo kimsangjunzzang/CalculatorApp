@@ -60,12 +60,10 @@ enum ButtonType : String {
         switch self {
         case .first,.second,.third,.forth,.fifth,.sixth,.seventh,.eighth,.nineth,.zero,.dot :
             return Color("ButtonColor")
-            
         case .equal,.plus,.minus,.multiple,.devide :
             return .orange
         case .percent,.opposite,.clear:
             return .gray
-            
         }
     }
     var forgroundColor: Color {
@@ -77,10 +75,12 @@ enum ButtonType : String {
 }
 
 struct ContentView: View {
+    
     @State var numSum : String = "0"
-    @State var tempNumber : Int = 0
+    @State var tempNumber : Double = 0
     @State var operatorType : ButtonType = .clear
     @State var isEditing : Bool = true
+    
     private let buttonData: [[ButtonType]] = [
         [.clear,.opposite,.percent,.devide],
         [.seventh,.eighth,.nineth,.multiple],
@@ -106,7 +106,7 @@ struct ContentView: View {
                     HStack{
                         ForEach(line,id: \.self){ item in
                             Button(action: {
-                                if numSum == "0"{
+                                if numSum == "0"{ // 계산기 시작 전
                                     if item == .plus ||
                                         item == .minus ||
                                         item == .multiple ||
@@ -119,19 +119,19 @@ struct ContentView: View {
                                         numSum += "."
                                     }
                                     else if item == .opposite{
-                                            numSum = "-\(numSum)"
+                                        numSum = "-\(numSum)"
                                         
                                     }
                                     else{numSum = item.ButtonDisplayName}
                                     
-                                } // 계산기 시작 전
-                                else{
+                                }
+                                else{ // 계산기 시작 후
                                     if item == .clear {
                                         numSum = "0"
-                                    } 
+                                    }
                                     else if item == .opposite{
                                         if numSum.contains("-"){
-                                            var editSum = numSum.dropFirst(1)
+                                            let editSum = numSum.dropFirst(1)
                                             numSum = String(editSum)
                                             
                                         }else{
@@ -142,20 +142,20 @@ struct ContentView: View {
                                         numSum = String(0.01 * Double(numSum)!)
                                     }
                                     else if item == .plus {
-                                        tempNumber = Int(numSum)!
+                                        tempNumber = Double(numSum)!
                                         operatorType = .plus
                                         numSum = "0"
                                     }else if item == .multiple {
-                                        tempNumber = Int(numSum)!
+                                        tempNumber = Double(numSum)!
                                         operatorType = .multiple
                                         numSum = "0"
                                     }else if item == .minus {
-                                        tempNumber = Int(numSum)!
+                                        tempNumber = Double(numSum)!
                                         operatorType = .minus
                                         numSum = "0"
                                     }
                                     else if item == .devide {
-                                        tempNumber = Int(numSum)!
+                                        tempNumber = Double(numSum)!
                                         operatorType = .devide
                                         numSum = "0"
                                     }
@@ -168,13 +168,13 @@ struct ContentView: View {
                                     }
                                     else if item == .equal{
                                         if operatorType == .plus {
-                                            numSum = String((Int(numSum))! + tempNumber)
+                                            numSum = String(format: "%g",(Double(numSum))! + tempNumber)
                                         }else  if operatorType == .multiple {
-                                            numSum = String((Int(numSum))! * tempNumber)
+                                            numSum = String(format: "%g",(Double(numSum))! * tempNumber)
                                         }else  if operatorType == .minus {
-                                            numSum = String(tempNumber - (Int(numSum))!)
+                                            numSum = String(format: "%g",tempNumber - (Double(numSum))!)
                                         }else  if operatorType == .devide {
-                                            numSum = String(tempNumber / (Int(numSum))!)
+                                            numSum = String(format: "%g",tempNumber / (Double(numSum))!)
                                         }
                                     }
                                     else{
@@ -189,8 +189,6 @@ struct ContentView: View {
                                     .cornerRadius(40)
                                     .foregroundColor(item.forgroundColor)
                                     .font(.system(size: 33))
-                                
-                                
                             })
                             
                             
