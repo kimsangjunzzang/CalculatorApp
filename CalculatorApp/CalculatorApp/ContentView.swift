@@ -46,7 +46,7 @@ enum ButtonType : String {
         case .multiple:
             return "x"
         case .devide:
-            return "/"
+            return "÷"
         case .percent:
             return "%"
         case .opposite:
@@ -76,10 +76,12 @@ enum ButtonType : String {
 
 struct ContentView: View {
     
-    @State var numSum : String = "0"
-    @State var tempNumber : Double = 0
+    @State var displayNumber : String = "0"
+    @State var num_1 : Double = 0
+    @State var num_2 : Double = 0
     @State var operatorType : ButtonType = .clear
-    @State var isEditing : Bool = true
+    
+    
     
     private let buttonData: [[ButtonType]] = [
         [.clear,.opposite,.percent,.devide],
@@ -95,9 +97,9 @@ struct ContentView: View {
             VStack(alignment:.trailing) {
                 Spacer()
                 
-                Text("\(numSum)")
+                Text("\(displayNumber)")
                     .foregroundStyle(.white)
-                    .font(.system(size: 70))
+                    .font(displayNumber.count > 7 ? .system(size: 40) : .system(size: 60))
                     .fontWeight(.bold)
                     .padding(.horizontal)
                 
@@ -106,7 +108,7 @@ struct ContentView: View {
                     HStack{
                         ForEach(line,id: \.self){ item in
                             Button(action: {
-                                if numSum == "0"{ // 계산기 시작 전
+                                if displayNumber == "0"{ // 계산기 시작 전
                                     if item == .plus ||
                                         item == .minus ||
                                         item == .multiple ||
@@ -114,71 +116,82 @@ struct ContentView: View {
                                         item == .equal ||
                                         item == .percent ||
                                         item == .clear{
-                                        numSum = "0"
+                                        displayNumber = "0"
                                     }else if item == .dot{
-                                        numSum += "."
+                                        displayNumber += "."
                                     }
                                     else if item == .opposite{
-                                        numSum = "-\(numSum)"
-                                        
+                                        displayNumber = "-\(displayNumber)"
                                     }
-                                    else{numSum = item.ButtonDisplayName}
+                                    else{displayNumber = item.ButtonDisplayName}
                                     
                                 }
                                 else{ // 계산기 시작 후
                                     if item == .clear {
-                                        numSum = "0"
+                                        displayNumber = "0"
                                     }
                                     else if item == .opposite{
-                                        if numSum.contains("-"){
-                                            let editSum = numSum.dropFirst(1)
-                                            numSum = String(editSum)
+                                        if displayNumber.contains("-"){
+                                            let editSum = displayNumber.dropFirst(1)
+                                            displayNumber = String(editSum)
                                             
                                         }else{
-                                            numSum = "-\(numSum)"
+                                            displayNumber = "-\(displayNumber)"
                                         }
                                     }
                                     else if item == .percent{
-                                        numSum = String(0.01 * Double(numSum)!)
+                                        displayNumber = String(0.01 * Double(displayNumber)!)
                                     }
                                     else if item == .plus {
-                                        tempNumber = Double(numSum)!
+                                        
+                                        num_1 = Double(displayNumber)!
                                         operatorType = .plus
-                                        numSum = "0"
+                                        displayNumber = "0"
                                     }else if item == .multiple {
-                                        tempNumber = Double(numSum)!
+                                        
+                                        num_1 = Double(displayNumber)!
                                         operatorType = .multiple
-                                        numSum = "0"
+                                        displayNumber = "0"
                                     }else if item == .minus {
-                                        tempNumber = Double(numSum)!
+                                        
+                                        num_1 = Double(displayNumber)!
                                         operatorType = .minus
-                                        numSum = "0"
+                                        displayNumber = "0"
+                                        
                                     }
                                     else if item == .devide {
-                                        tempNumber = Double(numSum)!
+                                        
+                                        num_1 = Double(displayNumber)!
                                         operatorType = .devide
-                                        numSum = "0"
+                                        displayNumber = "0"
                                     }
                                     else if item == .dot{
-                                        if(numSum.contains(".")){
-                                            numSum = numSum
+                                        if(displayNumber.contains(".")){
+                                            displayNumber = displayNumber
                                         }else{
-                                            numSum += "."
+                                            displayNumber += "."
                                         }
                                     }
+                                    
                                     else if item == .equal{
+                                        num_2 = (Double(displayNumber))!
+                                        
                                         if operatorType == .plus {
-                                            numSum = String(format: "%g",(Double(numSum))! + tempNumber)
+                                            displayNumber = String(format: "%g",num_2 + num_1)
+                                            
                                         }else  if operatorType == .multiple {
-                                            numSum = String(format: "%g",(Double(numSum))! * tempNumber)
+                                            displayNumber = String(format: "%g",num_2 * num_1)
+                                            
                                         }else  if operatorType == .minus {
-                                            numSum = String(format: "%g",tempNumber - (Double(numSum))!)
+                                            displayNumber = String(format: "%g",num_1 - num_2)
                                         }else  if operatorType == .devide {
-                                            numSum = String(format: "%g",tempNumber / (Double(numSum))!)
+                                            displayNumber = String(format: "%g",num_1 / num_2)
                                         }
                                     }
+                                    
                                     else{
-                                        numSum += item.ButtonDisplayName
+                                        
+                                        displayNumber += item.ButtonDisplayName
                                     }
                                 }
                                 
