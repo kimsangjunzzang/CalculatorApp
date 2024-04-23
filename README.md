@@ -21,5 +21,5 @@ Framework : SwiftUI, Foundation
 
 ## 작동 화면
 
-<img src="![GIFMaker_me (1)](https://github.com/kimsangjunzzang/CalculatorApp/assets/84498457/59912ab3-3630-4f91-97b4-12a20d6502ae)">
+<img src="https://github.com/kimsangjunzzang/CalculatorApp/assets/84498457/59912ab3-3630-4f91-97b4-12a20d6502ae">
 
