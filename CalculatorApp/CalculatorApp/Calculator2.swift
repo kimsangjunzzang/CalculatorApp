@@ -1,8 +1,8 @@
 //
-//  ContentView.swift
+//  Calculator2.swift
 //  CalculatorApp
 //
-//  Created by 김상준 on 4/21/24.
+//  Created by 김상준 on 4/23/24.
 //
 
 import SwiftUI
@@ -55,7 +55,6 @@ enum ButtonType : String {
             return "C"
         }
     }
-    
     var backgroundColor : Color {
         switch self {
         case .first,.second,.third,.forth,.fifth,.sixth,.seventh,.eighth,.nineth,.zero,.dot :
@@ -73,15 +72,18 @@ enum ButtonType : String {
         }
     }
 }
-
-struct ContentView: View {
+struct Calculator2: View {
     
     @State var displayNumber : String = "0"
-    @State var num_1 : Double = 0
-    @State var num_2 : Double = 0
-    @State var operatorType : ButtonType = .clear
+    @State var expression : String = ""
+    @State var mathExpression = NSExpression()
+    @State var mathValue : String = ""
     
-    
+    @State var isadd : Bool = false
+    @State var isminus : Bool = false
+    @State var ismultiple : Bool = false
+    @State var isdevide : Bool = false
+    @State var isequal : Bool = false
     
     private let buttonData: [[ButtonType]] = [
         [.clear,.opposite,.percent,.devide],
@@ -103,12 +105,12 @@ struct ContentView: View {
                     .fontWeight(.bold)
                     .padding(.horizontal)
                 
-                
                 ForEach(buttonData, id: \.self){ line in
                     HStack{
                         ForEach(line,id: \.self){ item in
                             Button(action: {
                                 if displayNumber == "0"{ // 계산기 시작 전
+                                    displayNumber = ""
                                     if item == .plus ||
                                         item == .minus ||
                                         item == .multiple ||
@@ -117,51 +119,55 @@ struct ContentView: View {
                                         item == .percent ||
                                         item == .clear{
                                         displayNumber = "0"
+                                        
                                     }else if item == .dot{
                                         displayNumber += "."
+                                        expression += "."
                                     }
                                     else if item == .opposite{
                                         displayNumber = "-\(displayNumber)"
+                                        expression += "-\(expression)"
                                     }
-                                    else{displayNumber = item.ButtonDisplayName}
-                                    
+                                    else{
+                                        expression += item.ButtonDisplayName
+                                        displayNumber += item.ButtonDisplayName
+                                    }
                                 }
                                 else{ // 계산기 시작 후
                                     if item == .clear {
                                         displayNumber = "0"
+                                        expression = ""
+                                        return
                                     }
                                     else if item == .opposite{
-                                        if displayNumber.contains("-"){
-                                            let editSum = displayNumber.dropFirst(1)
-                                            displayNumber = String(editSum)
+                                        if expression.contains("-"){
+                                            let editSum = expression.dropFirst(1)
+                                            expression = String(editSum)
                                             
                                         }else{
+                                            expression = "-\(expression)"
                                             displayNumber = "-\(displayNumber)"
                                         }
                                     }
                                     else if item == .percent{
+                                        expression = String(0.01 * Double(displayNumber)!)
                                         displayNumber = String(0.01 * Double(displayNumber)!)
                                     }
                                     else if item == .plus {
-                                        num_1 = Double(displayNumber)!
-                                        operatorType = .plus
-                                        displayNumber = "0"
-                                    }else if item == .multiple {
-                                        
-                                        num_1 = Double(displayNumber)!
-                                        operatorType = .multiple
-                                        displayNumber = "0"
-                                    }else if item == .minus {
-                                        num_1 = Double(displayNumber)!
-                                        operatorType = .minus
-                                        displayNumber = "0"
-                                        
+                                        isadd.toggle() // true
+                                        expression += "+"
+                                    }
+                                    else if item == .multiple {
+                                        ismultiple.toggle()
+                                        expression += "*"
+                                    }
+                                    else if item == .minus {
+                                        isminus.toggle()
+                                        expression += "-"
                                     }
                                     else if item == .devide {
-                                        
-                                        num_1 = Double(displayNumber)!
-                                        operatorType = .devide
-                                        displayNumber = "0"
+                                        isdevide.toggle()
+                                        expression += "/"
                                     }
                                     else if item == .dot{
                                         if(displayNumber.contains(".")){
@@ -170,27 +176,42 @@ struct ContentView: View {
                                             displayNumber += "."
                                         }
                                     }
-                                    
                                     else if item == .equal{
-                                        num_2 = (Double(displayNumber))!
-                                        
-                                        if operatorType == .plus {
-                                            displayNumber = String(format: "%g",num_2 + num_1)
-                                            
-                                            
-                                        }else  if operatorType == .multiple {
-                                            displayNumber = String(format: "%g",num_2 * num_1)
-                                            
-                                        }else  if operatorType == .minus {
-                                            displayNumber = String(format: "%g",num_1 - num_2)
-                                        }else  if operatorType == .devide {
-                                            displayNumber = String(format: "%g",num_1 / num_2)
-                                        }
+                                        mathExpression = NSExpression(format: expression)
+                                        mathValue = "\(mathExpression.expressionValue(with: nil, context: nil)!)"
+                                        displayNumber = String(mathValue)
+                                        print(type(of : expression))
                                     }
-                                    
                                     else{
                                         
-                                        displayNumber += item.ButtonDisplayName
+                                        if isadd{
+                                            displayNumber = ""
+                                            expression += item.ButtonDisplayName
+                                            displayNumber += item.ButtonDisplayName
+                                            isadd.toggle()
+                                        }
+                                        else if isminus{
+                                            displayNumber = ""
+                                            expression += item.ButtonDisplayName
+                                            displayNumber += item.ButtonDisplayName
+                                            isminus.toggle()
+                                        }
+                                        else if ismultiple{
+                                            displayNumber = ""
+                                            expression += item.ButtonDisplayName
+                                            displayNumber += item.ButtonDisplayName
+                                            ismultiple.toggle()
+                                        }
+                                        else if isdevide{
+                                            displayNumber = ""
+                                            expression += item.ButtonDisplayName
+                                            displayNumber += item.ButtonDisplayName
+                                            isdevide.toggle()
+                                        }else{
+                                            expression += item.ButtonDisplayName
+                                            displayNumber += item.ButtonDisplayName
+                                            
+                                        }
                                     }
                                 }
                                 
@@ -202,8 +223,6 @@ struct ContentView: View {
                                     .foregroundColor(item.forgroundColor)
                                     .font(.system(size: 33))
                             })
-                            
-                            
                         }
                     }
                 }
@@ -232,5 +251,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    Calculator2()
 }
