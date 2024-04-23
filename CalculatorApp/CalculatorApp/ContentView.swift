@@ -143,7 +143,6 @@ struct ContentView: View {
                                         displayNumber = String(0.01 * Double(displayNumber)!)
                                     }
                                     else if item == .plus {
-                                        
                                         num_1 = Double(displayNumber)!
                                         operatorType = .plus
                                         displayNumber = "0"
@@ -153,7 +152,6 @@ struct ContentView: View {
                                         operatorType = .multiple
                                         displayNumber = "0"
                                     }else if item == .minus {
-                                        
                                         num_1 = Double(displayNumber)!
                                         operatorType = .minus
                                         displayNumber = "0"
@@ -178,6 +176,7 @@ struct ContentView: View {
                                         
                                         if operatorType == .plus {
                                             displayNumber = String(format: "%g",num_2 + num_1)
+                                            
                                             
                                         }else  if operatorType == .multiple {
                                             displayNumber = String(format: "%g",num_2 * num_1)
